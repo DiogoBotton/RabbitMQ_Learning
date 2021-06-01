@@ -20,3 +20,5 @@ Repositório com fins de estudo utilizando RabbitMQ (Software de mensagens)
 * No navegador, coloque na URL o seguinte endereço
 
 ### `http://localhost:15672`
+
+* No início irá ser preciso colocar login e senha, apenas digite **guest** nos campos de usuário e senha
