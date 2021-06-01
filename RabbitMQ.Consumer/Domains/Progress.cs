@@ -1,10 +1,10 @@
-﻿using System;
+﻿using RabbitMQ.Consumer.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using WebApi.RabbitMQ.Producer.Enums;
 
-namespace WebApi.RabbitMQ.Producer.Domains
+namespace RabbitMQ.Consumer.Domains
 {
     public class Progress
     {
@@ -12,17 +12,17 @@ namespace WebApi.RabbitMQ.Producer.Domains
         public string Status { get; set; }
         public string Message { get; set; }
 
-        public Progress(string nomeArquivo)
+        public Progress()
         {
-            NomeArquivo = nomeArquivo;
-            Status = EnumProgress.Reading.ToString();
-            Message = ProgressDefaultValues.GetValue(EnumProgress.Reading) + $"{nomeArquivo}...";
+            NomeArquivo = "Sem referência";
+            Status = EnumProgress.Processing.ToString();
+            Message = ProgressDefaultValues.GetValue(EnumProgress.Processing);
         }
 
         public void UpdateStatusComplete()
         {
-            this.Status = EnumProgress.ReadingComplete.ToString();
-            Message = ProgressDefaultValues.GetValue(EnumProgress.ReadingComplete);
+            this.Status = EnumProgress.ProcessingComplete.ToString();
+            Message = ProgressDefaultValues.GetValue(EnumProgress.ProcessingComplete);
         }
 
         public void UpdateStatusError(string errorMessage)

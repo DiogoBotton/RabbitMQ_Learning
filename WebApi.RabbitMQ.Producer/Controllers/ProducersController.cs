@@ -65,7 +65,7 @@ namespace WebApi.RabbitMQ.Producer.Controllers
                 }
                 catch (Exception ex)
                 {
-                    currentProgress.UpdateStatusError(ex.Message);
+                    currentProgress.UpdateStatusError("Houve algum erro na leitura do arquivo. ErrorMessage: " + ex.Message);
 
                     // Envia Status de Erro para fila
                     Messenger.SendProgressQeue(currentProgress);

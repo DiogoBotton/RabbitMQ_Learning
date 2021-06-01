@@ -32,7 +32,7 @@ namespace RabbitMQ.Consumer.Notification
                         // Desserializa a mensagem string em uma lista de pessoas
                         Progress p = JsonConvert.DeserializeObject<Progress>(message);
 
-                        Console.WriteLine($"NomeArquivo: {p.NomeArquivo} | Status: {p.Status} | Mensagem: {p.Message}.");
+                        Console.WriteLine($"Notificação de Status: -> Status: {p.Status} | Mensagem: {p.Message}.");
 
                         channel.BasicAck(ea.DeliveryTag, false);
                     }
