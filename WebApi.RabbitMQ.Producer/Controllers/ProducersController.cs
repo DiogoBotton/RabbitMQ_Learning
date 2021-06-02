@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
+using RabbitMQ.Tools.Domains;
+using RabbitMQ.Tools.Enums;
+using RabbitMQ.Tools.Producers;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,10 +13,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using WebApi.RabbitMQ.Producer.Domains;
-using WebApi.RabbitMQ.Producer.Enums;
 using WebApi.RabbitMQ.Producer.Inputs;
-using WebApi.RabbitMQ.Producer.Producers;
 
 namespace WebApi.RabbitMQ.Producer.Controllers
 {
@@ -71,7 +71,7 @@ namespace WebApi.RabbitMQ.Producer.Controllers
                             result.Add(p);
                         }
 
-                        currentProgress.UpdateStatusComplete();
+                        currentProgress.UpdateStatusReadingComplete();
                         _messenger.SendMessage(currentProgress, QueuesDefaultValues.GetValue(EnumQueues.ProgressQueue));
                     }
                 }

@@ -5,12 +5,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using RabbitMQ.Tools.Contexts;
+using RabbitMQ.Tools.Producers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using WebApi.RabbitMQ.Producer.Contexts;
-using WebApi.RabbitMQ.Producer.Producers;
+using WebApi.RabbitMQ.Consumer.Receiver;
 
 namespace WebApi.RabbitMQ.Producer
 {
@@ -33,6 +34,8 @@ namespace WebApi.RabbitMQ.Producer
             services.AddTransient<IMessenger, Messenger>();
 
             services.AddControllers();
+
+            services.AddHostedService<PersonReceiver>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

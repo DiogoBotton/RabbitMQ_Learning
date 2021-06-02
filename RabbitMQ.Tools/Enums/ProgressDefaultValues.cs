@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace WebApi.RabbitMQ.Producer.Enums
+namespace RabbitMQ.Tools.Enums
 {
     public static class ProgressDefaultValues
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace WebApi.RabbitMQ.Producer.Domains
+namespace RabbitMQ.Tools.Domains
 {
     public class Pessoa
     {

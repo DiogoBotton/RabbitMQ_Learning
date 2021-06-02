@@ -7,9 +7,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WebApi.RabbitMQ.Producer.Domains;
 
-namespace WebApi.RabbitMQ.Producer.Producers
+namespace RabbitMQ.Tools.Producers
 {
     public class Messenger : IMessenger
     {
@@ -23,6 +22,15 @@ namespace WebApi.RabbitMQ.Producer.Producers
             _hostname = rabbitOptions.Value.HostName;
             _password = rabbitOptions.Value.Password;
             _username = rabbitOptions.Value.UserName;
+
+            CreateConnection();
+        }
+
+        public Messenger()
+        {
+            _hostname = "localhost";
+            _password = "guest";
+            _username = "guest";
 
             CreateConnection();
         }

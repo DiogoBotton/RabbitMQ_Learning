@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace WebApi.RabbitMQ.Producer.Contexts
+namespace RabbitMQ.Tools.Contexts
 {
     public class RabbitOptions
     {
