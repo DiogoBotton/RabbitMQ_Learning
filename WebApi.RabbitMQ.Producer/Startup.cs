@@ -9,6 +9,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WebApi.RabbitMQ.Producer.Contexts;
+using WebApi.RabbitMQ.Producer.Producers;
 
 namespace WebApi.RabbitMQ.Producer
 {
@@ -24,6 +26,11 @@ namespace WebApi.RabbitMQ.Producer
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // Configuração de localhost, username e password com appsettings.json
+            services.Configure<RabbitOptions>(Configuration.GetSection("RabbitMQ"));
+
+            // Injeção de dependência para o mensageiro do rabbitMq
+            services.AddTransient<IMessenger, Messenger>();
 
             services.AddControllers();
         }

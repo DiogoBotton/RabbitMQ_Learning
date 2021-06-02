@@ -11,6 +11,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using WebApi.RabbitMQ.Producer.Domains;
+using WebApi.RabbitMQ.Producer.Enums;
 using WebApi.RabbitMQ.Producer.Inputs;
 using WebApi.RabbitMQ.Producer.Producers;
 
@@ -21,11 +22,13 @@ namespace WebApi.RabbitMQ.Producer.Controllers
     public class ProducersController : ControllerBase
     {
         private ILogger<ProducersController> _logger { get; set; }
+        private IMessenger _messenger { get; set; }
 
 
-        public ProducersController(ILogger<ProducersController> logger)
+        public ProducersController(ILogger<ProducersController> logger, IMessenger messenger)
         {
             _logger = logger;
+            _messenger = messenger;
         }
 
         [HttpPost("new")]
@@ -42,25 +45,34 @@ namespace WebApi.RabbitMQ.Producer.Controllers
                     using (var reader = new StreamReader(input.File.OpenReadStream()))
                     {
                         // Envia Status de progresso para fila
-                        Messenger.SendProgressQeue(currentProgress);
+                        _messenger.SendMessage(currentProgress, QueuesDefaultValues.GetValue(EnumQueues.ProgressQueue));
 
+                        int cont = 0;
                         // Enquanto houver linhas, Adiciona-as na lista
                         while (reader.Peek() >= 0)
                         {
                             string line = await reader.ReadLineAsync();
 
+                            // Caso a linha atual seja o cabeçalho, pula o processo
+                            if (cont == 0)
+                            {
+                                cont++;
+                                continue;
+                            }
+
                             string[] itens = line.Split(",");
 
                             string nome = itens[0].Replace("\"", "");
-                            //int idade = Convert.ToInt32(itens[1].Replace("\"", ""));
+                            int idade = Convert.ToInt32(itens[3].Replace("\"", ""));
+                            string genero = itens[4].Replace("\"", "");
 
-                            Pessoa p = new Pessoa(nome, 20);
+                            Pessoa p = new Pessoa(nome, idade, genero);
 
                             result.Add(p);
                         }
 
                         currentProgress.UpdateStatusComplete();
-                        Messenger.SendProgressQeue(currentProgress);
+                        _messenger.SendMessage(currentProgress, QueuesDefaultValues.GetValue(EnumQueues.ProgressQueue));
                     }
                 }
                 catch (Exception ex)
@@ -68,13 +80,14 @@ namespace WebApi.RabbitMQ.Producer.Controllers
                     currentProgress.UpdateStatusError("Houve algum erro na leitura do arquivo. ErrorMessage: " + ex.Message);
 
                     // Envia Status de Erro para fila
-                    Messenger.SendProgressQeue(currentProgress);
+                    _messenger.SendMessage(currentProgress, QueuesDefaultValues.GetValue(EnumQueues.ProgressQueue));
 
-                    _logger.LogError("Erro ler linha do arquivo.", ex);
+                    _logger.LogError("Erro ao ler linha do arquivo.", ex);
                     return StatusCode((int)HttpStatusCode.InternalServerError, ex);
                 }
 
-                Messenger.SendPessoasQeue(result);
+                // Envia resultado para fila pessoasQueue
+                _messenger.SendMessage(result, QueuesDefaultValues.GetValue(EnumQueues.PessoasQueue));
 
                 return Ok(result);
             }

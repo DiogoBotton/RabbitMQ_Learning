@@ -9,11 +9,13 @@ namespace WebApi.RabbitMQ.Producer.Domains
     {
         public string Nome { get; set; }
         public int Idade { get; set; }
+        public string Genero { get; set; }
 
-        public Pessoa(string nome, int idade)
+        public Pessoa(string nome, int idade, string genero)
         {
             Nome = nome;
             Idade = idade;
+            Genero = genero;
         }
     }
 }

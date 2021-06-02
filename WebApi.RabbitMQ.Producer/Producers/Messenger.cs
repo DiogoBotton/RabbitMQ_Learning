@@ -1,60 +1,94 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using RabbitMQ.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WebApi.RabbitMQ.Producer.Contexts;
 using WebApi.RabbitMQ.Producer.Domains;
 
 namespace WebApi.RabbitMQ.Producer.Producers
 {
-    public static class Messenger
+    public class Messenger : IMessenger
     {
-        public static void SendPessoasQeue(List<Pessoa> data)
+        private readonly string _hostname;
+        private readonly string _password;
+        private readonly string _username;
+        private IConnection _connection;
+
+        public Messenger(IOptions<RabbitOptions> rabbitOptions)
         {
-            var factory = new ConnectionFactory() { HostName = "localhost" };
-            using (var connection = factory.CreateConnection())
-            using (var channel = connection.CreateModel())
+            _hostname = rabbitOptions.Value.HostName;
+            _password = rabbitOptions.Value.Password;
+            _username = rabbitOptions.Value.UserName;
+
+            CreateConnection();
+        }
+
+        // Este método recebe qualquer objeto, desde que seja uma classe
+        public void SendMessage<T>(T data, string queueName) where T : class
+        {
+            try
             {
-                channel.QueueDeclare(queue: "pessoasQueue",
+                if (ConnectionExists())
+                {
+                    using(var channel = _connection.CreateModel())
+                    {
+                        channel.QueueDeclare(queue: queueName,
                                      durable: false,
                                      exclusive: false,
                                      autoDelete: false,
                                      arguments: null);
 
-                string message = JsonConvert.SerializeObject(data);
-                var body = Encoding.UTF8.GetBytes(message);
+                        string message = JsonConvert.SerializeObject(data);
+                        var body = Encoding.UTF8.GetBytes(message);
 
-                channel.BasicPublish(exchange: "",
-                                     routingKey: "pessoasQueue",
+                        channel.BasicPublish(exchange: "",
+                                     routingKey: queueName,
                                      basicProperties: null,
                                      body: body);
-                Console.WriteLine(" [x] Sent {0}", message);
+
+                        Console.WriteLine(" [x] Sent {0}", message);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Houve um erro ao enviar mensagem à fila {queueName}. {ex.Message}");
             }
         }
 
-        public static void SendProgressQeue(Progress data)
+        public void CreateConnection()
         {
-            var factory = new ConnectionFactory() { HostName = "localhost" };
-            using (var connection = factory.CreateConnection())
-            using (var channel = connection.CreateModel())
+            try
             {
-                channel.QueueDeclare(queue: "progressQueue",
-                                     durable: false,
-                                     exclusive: false,
-                                     autoDelete: false,
-                                     arguments: null);
+                var factory = new ConnectionFactory()
+                {
+                    HostName = _hostname,
+                    Password = _password,
+                    UserName = _username
+                };
 
-                string message = JsonConvert.SerializeObject(data);
-                var body = Encoding.UTF8.GetBytes(message);
-
-                channel.BasicPublish(exchange: "",
-                                     routingKey: "progressQueue",
-                                     basicProperties: null,
-                                     body: body);
-                Console.WriteLine(" [x] Sent {0}", message);
+                _connection = factory.CreateConnection();
             }
+            catch (Exception ex)
+            {
+                throw new Exception($"Não foi possível estabelecer a conexão do RabbitMQ. {ex.Message}");
+            }
+        }
+
+        private bool ConnectionExists()
+        {
+            if (_connection != null)
+            {
+                return true;
+            }
+
+            CreateConnection();
+
+            return _connection != null;
         }
     }
 }

@@ -30,6 +30,8 @@ namespace RabbitMQ.Consumer
                 {
                     try
                     {
+                        // Reseta progresso quando é enviado novos objetos na fila
+                        currentProgress = new Progress();
                         // Atualização de Status
                         Messenger.SendProgressQeue(currentProgress);
 
@@ -41,7 +43,7 @@ namespace RabbitMQ.Consumer
 
                         foreach (var p in pessoas)
                         {
-                            Console.WriteLine($"Nome: {p.Nome} | Idade: {p.Idade}.");
+                            Console.WriteLine($"Nome: {p.Nome} | Idade: {p.Idade} | Genero: {p.Genero}.");
                         }
 
                         Console.WriteLine($"Número de pessoas: {pessoas.Count}");

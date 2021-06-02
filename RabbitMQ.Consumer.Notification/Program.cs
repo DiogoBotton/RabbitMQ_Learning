@@ -22,6 +22,7 @@ namespace RabbitMQ.Consumer.Notification
                                      arguments: null);
 
                 var consumer = new EventingBasicConsumer(channel);
+
                 consumer.Received += (model, ea) =>
                 {
                     try
@@ -33,6 +34,7 @@ namespace RabbitMQ.Consumer.Notification
                         Progress p = JsonConvert.DeserializeObject<Progress>(message);
 
                         Console.WriteLine($"Notificação de Status: -> Status: {p.Status} | Mensagem: {p.Message}.");
+                        Console.WriteLine();
 
                         channel.BasicAck(ea.DeliveryTag, false);
                     }
